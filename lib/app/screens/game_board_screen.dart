@@ -1,3 +1,4 @@
+import 'package:basic_game/api/repository.dart';
 import 'package:flutter/material.dart';
 
 class GameBoardScreen extends StatefulWidget {
@@ -8,8 +9,10 @@ class GameBoardScreen extends StatefulWidget {
 }
 
 class _GameBoardScreenState extends State<GameBoardScreen> {
+  final repo = getRepository;
   @override
   Widget build(BuildContext context) {
+    var data = repo.getRandomBoard();
     return Scaffold(
         body: Center(
       child: Container(
@@ -18,7 +21,7 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
         height: 300.0,
         child: const Center(
           child: Text(
-            "GameBoard Screen",
+            "Game Board Screen",
             style: TextStyle(fontSize: 50.0),
           ),
         ),
