@@ -12,7 +12,6 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
   final repo = getRepository;
   @override
   Widget build(BuildContext context) {
-    var data = repo.getRandomBoard();
     return Scaffold(
         body: Center(
       child: Container(

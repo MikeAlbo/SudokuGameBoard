@@ -15,14 +15,12 @@ final _boardDataApi = BoardDataApi(dataSetName: "fiveBoards.json");
 class _Repository {
   // initialize items upon new Repository instance
   void init() async {
-    _boardDataApi.initJSONDataFromAssets();
+    getRandomBoard();
     //final data = await _boardDataApi.getGameBoardById(id: 2);
   }
 
   Future<List<List>> getRandomBoard() {
-    Random random = Random();
-    int? length = _boardDataApi.getLength;
-    int id = random.nextInt(length ?? 5);
+    int id = Random().nextInt(5);
     print("id: $id");
     return _boardDataApi.getGameBoardById(id: id);
   }
