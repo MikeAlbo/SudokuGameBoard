@@ -33,3 +33,6 @@ class BoardDataApi {
     });
   }
 }
+
+//  TODO: consider making a data model for the Board Data
+//  TODO: may should refactor Python board builder to allow for id and board fields
