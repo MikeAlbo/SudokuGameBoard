@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:basic_game/api/repository.dart';
@@ -33,14 +34,16 @@ class GameBloc {
   Future<List<dynamic>> getGameBoardByID({required int id}) async {
     var gb = gameBoards ?? await _loadGameBoardDataSet();
     print(gb[0]["game_board"]);
-    return gb;
+    return gb[0]["game_board"];
   }
 
   //  TODO: get a single game board randomly
   Future<List<dynamic>> getRandomGameBoard() async {
     var gb = gameBoards ?? await _loadGameBoardDataSet();
     int id = Random().nextInt(gb.length);
-    return getGameBoardByID(id: id);
+    print("random int $id");
+    print(gb[id]["game_board"]);
+    return gb[id]["game_board"];
   }
   //  TODO: handle game settings (theme, etc.)
   //  TODO: handle game play settings (difficulty, etc.)

@@ -38,9 +38,12 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
   Widget build(BuildContext context) {
     GameBoardBloc _gameBoardBloc = GameBoardProvider.of(context);
     GameBloc gameBloc = GameProvider.of(context);
-    gameBloc.getRandomGameBoard();
-    // _gameBoardBloc.addSelectedNumber(InputValueModel(id: 2, value: 10));
-    // _gameBoardBloc.addSelectedTile(GameTileModel(id: 2, tileValue: 5));
+
+    void _getNewBoard() {
+      gameBloc.getRandomGameBoard();
+      setState(() {});
+    }
+
     // _gameBoardBloc.validAnswer.last((TileAnswerResponseModel event) {
     //   print("valid Answer added to, event => ${event.correctResponse}");
     // });
@@ -48,7 +51,7 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
         body: Center(
       child: Container(
         color: Colors.blue.shade100,
-        width: 500.0,
+        width: 1000.0,
         height: 300.0,
         child: Center(
           child: Column(
@@ -71,6 +74,12 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
                       child: const Text(
                         "Select Number",
                         style: TextStyle(fontSize: 30),
+                      )),
+                  TextButton(
+                      onPressed: () => _getNewBoard(),
+                      child: const Text(
+                        "Get New Board",
+                        style: TextStyle(fontSize: 50, color: Colors.red),
                       )),
                 ],
               ),
