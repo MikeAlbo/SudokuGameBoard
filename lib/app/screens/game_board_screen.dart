@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:basic_game/api/repository.dart';
+import 'package:basic_game/bloc/game/game_provider.dart';
 import 'package:basic_game/bloc/gameBoard/game_board_provider.dart';
 import 'package:basic_game/models/game_tile_model.dart';
 import 'package:basic_game/models/input_value_model.dart';
@@ -36,6 +37,8 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
   @override
   Widget build(BuildContext context) {
     GameBoardBloc _gameBoardBloc = GameBoardProvider.of(context);
+    GameBloc gameBloc = GameProvider.of(context);
+    gameBloc.getRandomGameBoard();
     // _gameBoardBloc.addSelectedNumber(InputValueModel(id: 2, value: 10));
     // _gameBoardBloc.addSelectedTile(GameTileModel(id: 2, tileValue: 5));
     // _gameBoardBloc.validAnswer.last((TileAnswerResponseModel event) {

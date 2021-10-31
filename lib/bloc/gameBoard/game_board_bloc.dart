@@ -56,3 +56,6 @@ _compareTransform(Stream<GameTileModel> tile) {
 
 //  TODO: remove test functions in game board
 //  TODO: create a stream that handles the generation of game boards
+//  TODO: revise models to handle tile states
+//  TODO: add functionality to select correct action
+//  TODO: may need to refactor stream transformer to accept "selection" -> bypass the number selection

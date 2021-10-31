@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:basic_game/api/boardData/board_data_api.dart';
 
 /// Repository
@@ -9,30 +7,17 @@ import 'package:basic_game/api/boardData/board_data_api.dart';
 ///
 
 // initialize  API instances
-final _boardDataApi = BoardDataApi(dataSetName: "fiveBoards.json");
+final _boardDataApi = BoardDataApi(dataSetName: "twoTest.json");
 
 // main class definition
 class _Repository {
   // initialize items upon new Repository instance
-  void init() async {
-    getRandomBoard();
-    //final data = await _boardDataApi.getGameBoardById(id: 2);
-  }
+  void init() async {}
 
-  // Get a random game board
-  //  TODO: get the length of the available dataset, use for nextInt limit
+  // return a game board from the BoardDataAPI
+  Future<List<dynamic>> get getAllLocalGameBoards =>
+      _boardDataApi.getJSONData();
   //  TODO: when SQLLite db ready, should store/ retrieve "played" boards
-  //  TODO: if id has been played, get new number. If all boards played, wipe table and start anew
-  Future<List<List>> getRandomBoard() {
-    int id = Random().nextInt(5);
-    print("id: $id");
-    return _boardDataApi.getGameBoardById(id: id);
-  }
-
-  // Get a board by specific ID
-  Future<List<List>> getBoardById({required int id}) {
-    return _boardDataApi.getGameBoardById(id: id);
-  }
 
   // constructor
   _Repository() {

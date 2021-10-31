@@ -18,21 +18,25 @@ class BoardDataApi {
 
   BoardDataApi({required this.dataSetName, this.rootFolder = "assets"});
 
-  // init setup of data from assets folder
-  Future<List<dynamic>> initJSONDataFromAssets() async {
-    String path = await rootBundle.loadString("$rootFolder/$dataSetName");
-    return jsonDecode(path);
+  // init setup of data from a local folder, defaults to "assets"
+  Future<String> _getAssetFromFile() async {
+    return await rootBundle.loadString(
+        "$rootFolder/$dataSetName"); //  TODO: handle loadString errors
+  }
+
+  Future<List<dynamic>> getJSONData() async {
+    return jsonDecode(
+        await _getAssetFromFile()); //  TODO: handleJSON decode error
   }
 
   // get  game board by ID
-  Future<List<List>> getGameBoardById({required int id}) async {
-    return await initJSONDataFromAssets().then((value) {
-      List<dynamic> mapped = Map<String, dynamic>.from(value[id]).values.first;
-      print(mapped.cast<List>());
-      return mapped.cast<List>();
-    });
-  }
+  // Future<List<List>> getGameBoardById({required int id}) async {
+  //   return await initJSONDataFromLocalStorage().then((value) {
+  //     List<dynamic> mapped = Map<String, dynamic>.from(value[id]).values.first;
+  //     print(mapped.cast<List>());
+  //     return mapped.cast<List>();
+  //   });
+  // }
 }
 
 //  TODO: consider making a data model for the Board Data
-//  TODO: may should refactor Python board builder to allow for id and board fields
