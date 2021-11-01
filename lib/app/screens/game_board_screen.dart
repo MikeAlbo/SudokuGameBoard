@@ -1,11 +1,12 @@
 import 'dart:math';
 
 import 'package:basic_game/api/repository.dart';
+import 'package:basic_game/app/widgets/game_board.dart';
+import 'package:basic_game/app/widgets/helpers/grid_builder.dart';
 import 'package:basic_game/bloc/game/game_provider.dart';
 import 'package:basic_game/bloc/gameBoard/game_board_provider.dart';
 import 'package:basic_game/models/game_tile_model.dart';
 import 'package:basic_game/models/input_value_model.dart';
-import 'package:basic_game/models/tile_answer_response_model.dart';
 import 'package:flutter/material.dart';
 
 class GameBoardScreen extends StatefulWidget {
@@ -48,58 +49,18 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
     //   print("valid Answer added to, event => ${event.correctResponse}");
     // });
     return Scaffold(
-        body: Center(
-      child: Container(
-        color: Colors.blue.shade100,
-        width: 1000.0,
-        height: 300.0,
-        child: Center(
-          child: Column(
-            children: [
-              const Text(
-                "Game Board Screen",
-                style: TextStyle(fontSize: 50.0),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                      onPressed: () => _selectTile(_gameBoardBloc),
-                      child: const Text(
-                        "Select Tile",
-                        style: TextStyle(fontSize: 30),
-                      )),
-                  TextButton(
-                      onPressed: () => _selectNumber(_gameBoardBloc),
-                      child: const Text(
-                        "Select Number",
-                        style: TextStyle(fontSize: 30),
-                      )),
-                  TextButton(
-                      onPressed: () => _getNewBoard(),
-                      child: const Text(
-                        "Get New Board",
-                        style: TextStyle(fontSize: 50, color: Colors.red),
-                      )),
-                ],
-              ),
-              StreamBuilder<Object>(
-                  stream: _gameBoardBloc.validAnswer,
-                  builder: (context, snapshot) {
-                    TileAnswerResponseModel? _tile =
-                        snapshot.data as TileAnswerResponseModel?;
-                    return !snapshot.hasData
-                        ? Text("nothing yet")
-                        : Text(
-                            "${_tile?.correctResponse}",
-                            style: TextStyle(fontSize: 50),
-                          );
-                  }),
-            ],
-          ),
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            buildGameBoard(
+                tableWidth: 1000,
+                tableHeight: 1000,
+                child: gridBuilder(9, 9, context)),
+          ],
         ),
       ),
-    ));
+    );
   }
 }
 
