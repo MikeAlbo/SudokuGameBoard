@@ -22,7 +22,7 @@ Container buildGameBoard({
         border: TableBorder.symmetric(
           outside: const BorderSide(
             color: Colors.black,
-            width: 5,
+            width: 2,
           ),
         ),
         defaultVerticalAlignment: TableCellVerticalAlignment.top,

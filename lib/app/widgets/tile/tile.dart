@@ -1,24 +1,19 @@
 import 'package:basic_game/Themes/tile_decoration_themes.dart';
 import 'package:basic_game/app/widgets/tile/tile_animation.dart';
+import 'package:basic_game/bloc/gameBoard/game_board_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
 
 import 'tile_helper.dart';
 
-BoxDecoration tileDecoration() {
-  return BoxDecoration(
-    borderRadius: const BorderRadius.all(Radius.circular(5)),
-    border: Border.all(
-      width: 1,
-      color: Colors.black,
-    ),
-    color: Colors.white60,
-  );
-}
-
 TextStyle tileTextDecoration() {
   return const TextStyle(fontSize: 30, color: Colors.black);
-}
+} //  TODO: remove to theme widget
+
+//  TODO: tile should i tile model over the stream when selected
+//  TODO: tile should listen for it's id and response from bloc
+//  TODO: tile should animate based on state of tile
+//  TODO: animation bool / enum to determine state of animation
 
 class Tile extends StatefulWidget {
   final TileDecorationParams tileDecorationParams;
@@ -52,6 +47,8 @@ class _TileState extends State<Tile> {
   Color tileColor = Colors.white;
   // tile animation bool
   bool animationComplete = true;
+  // current tile mode
+  TileMode tileMode = TileMode.blank;
   // set child completed function
   void setTileToComplete() => tileCompleted = true;
 
@@ -63,6 +60,8 @@ class _TileState extends State<Tile> {
         : widget.tileDecorationParams.blankInactive;
 
     tileCompleted = widget.initAsVisible;
+
+    tileMode = widget.initAsVisible ? TileMode.completed : TileMode.blank;
   }
 
   void updateState({required Color color, required bool setToComplete}) {
@@ -74,14 +73,21 @@ class _TileState extends State<Tile> {
     });
   }
 
-  void handleOnTap() {
+  void updateTileMode(
+      {required TileMode currentTileMode, required TileMode newTileMode}) {
+    setState(() {
+      selectTileMode(currentMode: currentTileMode, newMode: newTileMode);
+    });
+  }
+
+  void handleOnTap(GameBoardBloc bloc) {
     // todo: this will eventually send the tile value to the stream to be
     //  evaluated, which will return how the correct tile mode to be used
 
     Tuple3<Color, int, bool> animationParams;
 
-    animationParams = selectAnimation(
-        tileCompleted ? TileMode.highlighted : TileMode.selected);
+    animationParams =
+        selectAnimation(tileCompleted ? TileMode.highlighted : TileMode.active);
     updateState(
       color: animationParams.item1,
       setToComplete: animationParams.item3,
@@ -90,8 +96,10 @@ class _TileState extends State<Tile> {
 
   @override
   Widget build(BuildContext context) {
+    // access to gameBoard bloc
+    GameBoardBloc gameBoardBloc = GameBoardProvider.of(context);
     return GestureDetector(
-      onTap: () => handleOnTap(),
+      onTap: () => handleOnTap(gameBoardBloc),
       child: AnimatedContainer(
         duration: Duration(milliseconds: animationDuration),
         decoration: BoxDecoration(

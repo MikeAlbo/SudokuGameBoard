@@ -21,6 +21,114 @@ enum TileMode {
   notes, // notes mode, will change layout of tile to support grid of notes
 }
 
+/// Tile selection helper
+///
+/// select the correct tile mode based on rules
+TileMode selectTileMode(
+    {required TileMode currentMode, required TileMode newMode}) {
+  //  TODO: if tile mode is complete, can only be updated to highlighted, and back
+  //  TODO: if tile is blank, can use other modes except highlighted
+  //  TODO: can only go from correct to complete
+  TileMode updatedMode = currentMode;
+
+  switch (currentMode) {
+    case TileMode.completed:
+      {
+        updatedMode = TileMode.highlighted;
+        break;
+      }
+    case TileMode.correct:
+      {
+        updatedMode = TileMode.completed;
+        break;
+      }
+    case TileMode.highlighted:
+      {
+        updatedMode = TileMode.completed;
+        break;
+      }
+    case TileMode.error:
+      {
+        updatedMode = TileMode.blank;
+        break;
+      }
+    case TileMode.notes:
+      {
+        updatedMode = TileMode.blank;
+        break;
+      }
+    case TileMode.active:
+      {
+        switch (newMode) {
+          case TileMode.correct:
+            {
+              updatedMode = TileMode.completed;
+              break;
+            }
+          case TileMode.blank:
+            {
+              updatedMode = TileMode.blank;
+              break;
+            }
+          case TileMode.active:
+            updatedMode = TileMode.active;
+            break;
+          case TileMode.completed:
+            updatedMode = TileMode.active;
+            break;
+          case TileMode.highlighted:
+            updatedMode = TileMode.active;
+            break;
+          case TileMode.error:
+            updatedMode = TileMode.active;
+            break;
+          case TileMode.notes:
+            updatedMode = TileMode.active;
+            break;
+          case TileMode.selected:
+            updatedMode = updatedMode;
+            break;
+        }
+        break;
+      }
+    case TileMode.blank:
+      {
+        switch (newMode) {
+          case TileMode.blank:
+            updatedMode = TileMode.blank;
+            break;
+          case TileMode.active:
+            updatedMode = TileMode.blank;
+            break;
+          case TileMode.completed:
+            updatedMode = TileMode.blank;
+            break;
+          case TileMode.highlighted:
+            updatedMode = TileMode.blank;
+            break;
+          case TileMode.error:
+            updatedMode = TileMode.blank;
+            break;
+          case TileMode.correct:
+            updatedMode = TileMode.blank;
+            break;
+          case TileMode.notes:
+            updatedMode = TileMode.notes;
+            break;
+          case TileMode.selected:
+            updatedMode = updatedMode;
+            break;
+        }
+        break;
+      }
+    case TileMode.selected:
+      updatedMode = updatedMode;
+      break;
+  }
+
+  return updatedMode;
+}
+
 /// TileBorderGenerator
 ///
 /// TileBorderGenerator takes in the id [1,2,3,etc.] of the tile and provides
