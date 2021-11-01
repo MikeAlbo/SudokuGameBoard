@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 ///
 /// Returns a container that contains the game board tiles.
 ///
-Container buildGameBoard(
-    {required double tableWidth,
-    required double tableHeight,
-    required List<TableRow> child}) {
+Container buildGameBoard({
+  required double tableWidth,
+  required double tableHeight,
+  required bool isFullScreen,
+  required List<TableRow> child,
+}) {
   return Container(
       width: tableWidth,
       height: tableHeight,
@@ -15,7 +17,8 @@ Container buildGameBoard(
           10), //  TODO:maybe need to convert to dynamic value
       child: FittedBox(
           child: Table(
-        defaultColumnWidth: FixedColumnWidth(tableWidth / 9),
+        defaultColumnWidth:
+            FixedColumnWidth(isFullScreen ? tableWidth / 10 : tableWidth / 9),
         border: TableBorder.symmetric(
           outside: const BorderSide(
             color: Colors.black,
@@ -25,4 +28,11 @@ Container buildGameBoard(
         defaultVerticalAlignment: TableCellVerticalAlignment.top,
         children: child,
       )));
+}
+
+double _adjustColumnWidthForDisplaySize(
+    {required bool isFullScreen, required double width}) {
+  double adjustedWidth = isFullScreen ? 10 : 6;
+  print("adjustedWidth: ${adjustedWidth * width}");
+  return width / adjustedWidth;
 }
