@@ -14,120 +14,17 @@ enum TileMode {
   blank, // a blank tile in a neutral state
   active, // a tile that is actively selected but not completed
   completed, // a tile that is numbered, no longer selectable -- when in this mode, no other mode can be applied --
-  selected, // visual/ haptic feedback that a tile has been tapped, pressed, or drag event
-  highlighted, // visual cue for user when like numbers/ row / column are selected
-  error, // incorrect input feedback for user, both haptic and visual
-  correct, // correct input feedback for user when input matches value
   notes, // notes mode, will change layout of tile to support grid of notes
 }
 
-/// Tile selection helper
-///
-/// select the correct tile mode based on rules
-TileMode selectTileMode(
-    {required TileMode currentMode, required TileMode newMode}) {
-  //  TODO: if tile mode is complete, can only be updated to highlighted, and back
-  //  TODO: if tile is blank, can use other modes except highlighted
-  //  TODO: can only go from correct to complete
-  TileMode updatedMode = currentMode;
-
-  switch (currentMode) {
-    case TileMode.completed:
-      {
-        updatedMode = TileMode.highlighted;
-        break;
-      }
-    case TileMode.correct:
-      {
-        updatedMode = TileMode.completed;
-        break;
-      }
-    case TileMode.highlighted:
-      {
-        updatedMode = TileMode.completed;
-        break;
-      }
-    case TileMode.error:
-      {
-        updatedMode = TileMode.blank;
-        break;
-      }
-    case TileMode.notes:
-      {
-        updatedMode = TileMode.blank;
-        break;
-      }
-    case TileMode.active:
-      {
-        switch (newMode) {
-          case TileMode.correct:
-            {
-              updatedMode = TileMode.completed;
-              break;
-            }
-          case TileMode.blank:
-            {
-              updatedMode = TileMode.blank;
-              break;
-            }
-          case TileMode.active:
-            updatedMode = TileMode.active;
-            break;
-          case TileMode.completed:
-            updatedMode = TileMode.active;
-            break;
-          case TileMode.highlighted:
-            updatedMode = TileMode.active;
-            break;
-          case TileMode.error:
-            updatedMode = TileMode.active;
-            break;
-          case TileMode.notes:
-            updatedMode = TileMode.active;
-            break;
-          case TileMode.selected:
-            updatedMode = updatedMode;
-            break;
-        }
-        break;
-      }
-    case TileMode.blank:
-      {
-        switch (newMode) {
-          case TileMode.blank:
-            updatedMode = TileMode.blank;
-            break;
-          case TileMode.active:
-            updatedMode = TileMode.blank;
-            break;
-          case TileMode.completed:
-            updatedMode = TileMode.blank;
-            break;
-          case TileMode.highlighted:
-            updatedMode = TileMode.blank;
-            break;
-          case TileMode.error:
-            updatedMode = TileMode.blank;
-            break;
-          case TileMode.correct:
-            updatedMode = TileMode.blank;
-            break;
-          case TileMode.notes:
-            updatedMode = TileMode.notes;
-            break;
-          case TileMode.selected:
-            updatedMode = updatedMode;
-            break;
-        }
-        break;
-      }
-    case TileMode.selected:
-      updatedMode = updatedMode;
-      break;
-  }
-
-  return updatedMode;
+enum TileResponse {
+  correct, // user input was correct
+  incorrect, // user input was incorrect
+  highlighted, // user selected a complete tile, tile should be highlighted
 }
+
+//  TODO: will probably need to separate out the enums into two, response, and tileState
+//  TODO: responses will
 
 /// TileBorderGenerator
 ///

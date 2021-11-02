@@ -1,5 +1,6 @@
 import 'package:basic_game/app/widgets/game_board.dart';
 import 'package:basic_game/app/widgets/helpers/grid_builder.dart';
+import 'package:basic_game/app/widgets/number_row_selector.dart';
 import 'package:flutter/material.dart';
 
 class GameBoardScreen extends StatefulWidget {
@@ -55,18 +56,18 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            //crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              buildGameBoard(
-                  tableWidth: _getAspectSize(screenWidth, isFullScreen),
-                  tableHeight: _getAspectSize(screenHeight, isFullScreen),
-                  isFullScreen: isFullScreen,
-                  child: gridBuilder(9, 9, context)),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          // crossAxisAlignment:
+          //     CrossAxisAlignment.stretch, //  TODO: use for full screen
+          children: [
+            buildGameBoard(
+                tableWidth: _getAspectSize(screenWidth, isFullScreen),
+                tableHeight: _getAspectSize(screenHeight, isFullScreen),
+                isFullScreen: isFullScreen,
+                child: gridBuilder(9, 9, context)),
+            const NumberRowSelector(),
+          ],
         ),
       ),
     );

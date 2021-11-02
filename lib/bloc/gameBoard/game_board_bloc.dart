@@ -50,6 +50,7 @@ _compareTransform(Stream<GameTileModel> tile) {
       (List<InputValueModel> t, List<GameTileModel> s) {
     return TileAnswerResponseModel(
         tileId: s.single.id,
+        tileValue: s.single.tileValue,
         correctResponse: t.single.value == s.single.tileValue);
   });
 }
