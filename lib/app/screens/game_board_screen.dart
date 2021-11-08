@@ -1,7 +1,7 @@
 import 'package:basic_game/app/widgets/game_board.dart';
-import 'package:basic_game/app/widgets/helpers/grid_builder.dart';
 import 'package:basic_game/app/widgets/number_row_selector.dart';
 import 'package:basic_game/bloc/gameBoard/game_board_provider.dart';
+import 'package:basic_game/helpers/enums.dart';
 import 'package:flutter/material.dart';
 
 class GameBoardScreen extends StatefulWidget {
@@ -14,7 +14,9 @@ class GameBoardScreen extends StatefulWidget {
 class _GameBoardScreenState extends State<GameBoardScreen> {
   @override
   Widget build(BuildContext context) {
+    print("screen built");
     GameBoardBloc _gameBoardBloc = GameBoardProvider.of(context);
+    _gameBoardBloc.selectDifficulty(GameDifficulty.medium);
     Size screenSize = MediaQuery.of(context).size;
     double screenHeight = screenSize.height;
     double screenWidth = screenSize.width;
@@ -42,11 +44,21 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
           // crossAxisAlignment:
           //     CrossAxisAlignment.stretch, //  TODO: use for full screen
           children: [
-            buildGameBoard(
-                tableWidth: _getAspectSize(screenWidth, isFullScreen),
-                tableHeight: _getAspectSize(screenHeight, isFullScreen),
-                isFullScreen: isFullScreen,
-                child: gridBuilder(9, 9, context)),
+            FutureBuilder(
+              future: _gameBoardBloc.getCurrentGame(context),
+              builder: (BuildContext context,
+                      AsyncSnapshot<List<TableRow>> snapshot) =>
+                  snapshot.hasData
+                      ? buildGameBoard(
+                          tableWidth: _getAspectSize(screenWidth, isFullScreen),
+                          tableHeight:
+                              _getAspectSize(screenHeight, isFullScreen),
+                          isFullScreen: isFullScreen,
+                          child: snapshot.data!)
+                      : const Center(
+                          child: Text("loading"),
+                        ),
+            ),
             const NumberRowSelector(),
           ],
         ),

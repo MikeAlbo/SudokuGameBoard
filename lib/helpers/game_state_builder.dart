@@ -42,7 +42,7 @@ List<bool> generateRandomList(
 
 //  TODO: function that takes in a game bord data set and returns a map<int, TileStateModel>
 Map<int, TileStateModel> buildTileStateMap(
-    {List<List<dynamic>> gameBoard = mockGameBoardData,
+    {List<dynamic> gameBoard = mockGameBoardData,
     required int numberOfCompletedTiles}) {
   // randomized t/f values t == complete, f == blank
   List<bool> randomizedTrue =
@@ -57,7 +57,8 @@ Map<int, TileStateModel> buildTileStateMap(
       tempMap[id] = TileStateModel(
         id: id,
         value: gameBoard[row][col],
-        mode: randomizedTrue[id - 1] ? TileMode.complete : TileMode.blank,
+        mode:
+            randomizedTrue[id - 1] == true ? TileMode.complete : TileMode.blank,
       );
     }
   }

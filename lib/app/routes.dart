@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 /// returns the route to the Game Board Screen
 Route getGameBoardScreen({required RouteSettings settings}) {
   return MaterialPageRoute(builder: (BuildContext ctx) {
+    //final GameBoardBloc gameBoardBloc = GameBoardProvider.of(ctx);
     return const GameBoardScreen();
   });
 }
