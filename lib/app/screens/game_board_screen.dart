@@ -1,6 +1,7 @@
 import 'package:basic_game/app/widgets/game_board.dart';
 import 'package:basic_game/app/widgets/helpers/grid_builder.dart';
 import 'package:basic_game/app/widgets/number_row_selector.dart';
+import 'package:basic_game/bloc/gameBoard/game_board_provider.dart';
 import 'package:flutter/material.dart';
 
 class GameBoardScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class GameBoardScreen extends StatefulWidget {
 class _GameBoardScreenState extends State<GameBoardScreen> {
   @override
   Widget build(BuildContext context) {
+    GameBoardBloc _gameBoardBloc = GameBoardProvider.of(context);
     Size screenSize = MediaQuery.of(context).size;
     double screenHeight = screenSize.height;
     double screenWidth = screenSize.width;
