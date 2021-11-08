@@ -38,7 +38,7 @@ class GameBoardBloc {
   }
 
   // get a single game board by ID
-  Future<List<dynamic>> getGameBoardByID({required int id}) async {
+  Future<List<dynamic>> _getGameBoardByID({required int id}) async {
     var gb = gameBoards ?? await _loadGameBoardDataSet();
     print(gb[0]["game_board"]);
     return gb[0]["game_board"];
@@ -65,11 +65,7 @@ class GameBoardBloc {
   }
 
   //  TODO: function called by user or game engine to generate a new game board and tile state
-
-  //  TODO: inside widgets ->  create a builder that returns a build gameBoard widget
-
-  //  TODO: below functions should be private, create a public method that handles the request from the tile
-  Future<List<TableRow>> getCurrentGame(BuildContext context,
+  Future<List<TableRow>> generateNewRandomGame(BuildContext context,
       {bool random = false, int id = 0}) async {
     print("get current game");
     List<dynamic> gameBoard = await _getRandomGameBoard();
@@ -78,7 +74,6 @@ class GameBoardBloc {
     mappedTilesForCurrentGame = mappedStates;
     List<TableRow> finishedTableRows =
         newGridBuilder(context: context, mappedStates: mappedStates);
-    // List<TableRow> finishedTableRows = gridBuilder(9, 9, context, mappedStates);
 
     return finishedTableRows;
   }

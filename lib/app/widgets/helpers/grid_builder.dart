@@ -17,24 +17,6 @@ List<TableRow> newGridBuilder(
   double tileHeight = ctxSize.height / 15;
   List<TableRow> gridOfRows = [];
   List<Tile> rowValues = [];
-  // for (var i = 1; i <= 81; i++) {
-  //   TileStateModel tsm = mappedStates[i] as TileStateModel;
-  //   print("--> tsm --> id: ${tsm.id}, value: ${tsm.value}, mode: ${tsm.mode} ");
-  //   rowValues.add(Tile(
-  //       tileDecorationParams: tileDecorationParams,
-  //       tileWidth: tileWidth,
-  //       tileHeight: tileHeight,
-  //       value: tsm.value,
-  //       id: tsm.id,
-  //       initAsVisible: tsm.mode == TileMode.complete ? true : false,
-  //       location: [1, 1, 1]));
-  //   if (rowValues.length == 9) {
-  //     gridOfRows.add(TableRow(children: rowValues));
-  //     print("grid added ---> $rowValues, ---> $gridOfRows");
-  //     rowValues.clear();
-  //   }
-  // }
-
   mappedStates.forEach((key, value) {
     rowValues.add(Tile(
         tileDecorationParams: tileDecorationParams,
@@ -57,35 +39,35 @@ List<TableRow> newGridBuilder(
   return gridOfRows;
 }
 
-List<TableRow> gridBuilder(
-    columns, rows, context, Map<int, TileStateModel> mapped) {
-  // _gridBuilder(context: context, mappedStates: mapped);
-  // todo: this should be init globally or at least outside of this function
-  TileDecorationParams tileDecorationParams = TileDecorationParams();
-  Size ctxSize = MediaQuery.of(context).size;
-  double tileWidth = ctxSize.width / 15;
-  double tileHeight = ctxSize.height / 15;
-  // todo: try and boxFit the tile into the container vs manipulating size params
-  int mockId = 0; // mock tile id
-  List<TableRow> gridOfRows = [];
-  for (var r = 0; r < rows; r++) {
-    List<Tile> rowValues = [];
-    for (var c = 0; c < columns; c++) {
-      mockId++;
-      rowValues.add(Tile(
-          tileDecorationParams: tileDecorationParams,
-          tileWidth: tileWidth,
-          tileHeight: tileHeight,
-          value: random.nextInt(9),
-          id: mockId,
-          initAsVisible: random.nextInt(10).isEven,
-          location: [r, c, r + c]));
-      if (rowValues.length == columns) {
-        TableRow tableRow = TableRow(children: rowValues);
-        //print(tableRow);
-        gridOfRows.add(tableRow);
-      }
-    }
-  }
-  return gridOfRows;
-}
+// List<TableRow> gridBuilder(
+//     columns, rows, context, Map<int, TileStateModel> mapped) {
+//   // _gridBuilder(context: context, mappedStates: mapped);
+//   // todo: this should be init globally or at least outside of this function
+//   TileDecorationParams tileDecorationParams = TileDecorationParams();
+//   Size ctxSize = MediaQuery.of(context).size;
+//   double tileWidth = ctxSize.width / 15;
+//   double tileHeight = ctxSize.height / 15;
+//   // todo: try and boxFit the tile into the container vs manipulating size params
+//   int mockId = 0; // mock tile id
+//   List<TableRow> gridOfRows = [];
+//   for (var r = 0; r < rows; r++) {
+//     List<Tile> rowValues = [];
+//     for (var c = 0; c < columns; c++) {
+//       mockId++;
+//       rowValues.add(Tile(
+//           tileDecorationParams: tileDecorationParams,
+//           tileWidth: tileWidth,
+//           tileHeight: tileHeight,
+//           value: random.nextInt(9),
+//           id: mockId,
+//           initAsVisible: random.nextInt(10).isEven,
+//           location: [r, c, r + c]));
+//       if (rowValues.length == columns) {
+//         TableRow tableRow = TableRow(children: rowValues);
+//         //print(tableRow);
+//         gridOfRows.add(tableRow);
+//       }
+//     }
+//   }
+//   return gridOfRows;
+// }

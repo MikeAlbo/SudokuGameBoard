@@ -45,7 +45,7 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
           //     CrossAxisAlignment.stretch, //  TODO: use for full screen
           children: [
             FutureBuilder(
-              future: _gameBoardBloc.getCurrentGame(context),
+              future: _gameBoardBloc.generateNewRandomGame(context),
               builder: (BuildContext context,
                       AsyncSnapshot<List<TableRow>> snapshot) =>
                   snapshot.hasData
