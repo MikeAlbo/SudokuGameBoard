@@ -9,19 +9,14 @@
 import 'package:basic_game/Themes/tile_decoration_themes.dart';
 import 'package:flutter/material.dart';
 
-/// TileMode is  used to identify or modify the state of the Tile.
-enum TileMode {
-  blank, // a blank tile in a neutral state
-  active, // a tile that is actively selected but not completed
-  completed, // a tile that is numbered, no longer selectable -- when in this mode, no other mode can be applied --
-  notes, // notes mode, will change layout of tile to support grid of notes
-}
-
-enum TileResponse {
-  correct, // user input was correct
-  incorrect, // user input was incorrect
-  highlighted, // user selected a complete tile, tile should be highlighted
-}
+//  TODO: remove
+// enum TileResponse {
+//   selected, // when a user selects a tile
+//   correct, // user input was correct
+//   incorrect, // user input was incorrect
+//   highlighted, // user selected a complete tile, tile should be highlighted
+//   notes, // notes mode
+// }
 
 //  TODO: will probably need to separate out the enums into two, response, and tileState
 //  TODO: responses will

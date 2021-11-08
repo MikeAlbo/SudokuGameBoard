@@ -1,6 +1,4 @@
-import 'package:basic_game/bloc/gameBoard/game_board_bloc.dart';
 import 'package:basic_game/bloc/gameBoard/game_board_provider.dart';
-import 'package:basic_game/models/input_value_model.dart';
 import 'package:flutter/material.dart';
 
 class NumberRowSelector extends StatelessWidget {
@@ -30,8 +28,9 @@ List<GestureDetector> buildNumbers(GameBoardBloc gameBoardBloc) {
 GestureDetector numberBuilder(
     {required GameBoardBloc gameBoardBloc, required int number}) {
   return GestureDetector(
-    onTap: () =>
-        gameBoardBloc.addSelectedNumber(InputValueModel(id: 1, value: number)),
+    onTap: () {
+      // gameBoardBloc.compareNumberToTileValue(number);
+    },
     child: Container(
       height: 100,
       width: 100,

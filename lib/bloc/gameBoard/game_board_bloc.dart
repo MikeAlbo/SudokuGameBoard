@@ -1,62 +1,81 @@
 import 'dart:core';
+import 'dart:math';
 
 import 'package:basic_game/api/repository.dart';
+import 'package:basic_game/helpers/enums.dart';
+import 'package:basic_game/helpers/game_state_builder.dart';
 import 'package:basic_game/models/game_tile_model.dart';
-import 'package:basic_game/models/input_value_model.dart';
-import 'package:basic_game/models/tile_answer_response_model.dart';
+import 'package:basic_game/models/tile_state_model.dart';
 import 'package:rxdart/rxdart.dart';
 
-//  TODO: get a game board set
-//  TODO: capture the input from a tile selection
-//  TODO: capture the input from the available selected tiles
-//  TODO: handle the DB logging of each game state
-//  TODO: handle the error logging/ response
-// maybe should capture both into an object with a function
-// then send that object into the stream to be parsed.
 class GameBoardBloc {
-  final repo = getRepository;
-  final _selectedTile = BehaviorSubject<GameTileModel>();
-  final _selectedNumber = BehaviorSubject<InputValueModel>();
-  final _validAnswer = BehaviorSubject<TileAnswerResponseModel>();
+  final _repo = getRepository;
+  late List<dynamic>? gameBoards;
+  GameDifficulty _gameDifficulty = GameDifficulty.easy;
+  int _initCompletedTiles = 0;
+  final _tileListenerStream = BehaviorSubject<Map<int, TileStateModel>>();
+  GameTileModel? _selectedTileValue;
 
   // getter for listening for correct answer
-  Stream<TileAnswerResponseModel> get validAnswer => _validAnswer.stream;
-
-  // getter to add item to selectedTile
-  Function(GameTileModel) get addSelectedTile => _selectedTile.sink.add;
-
-  // getter to add item to selectedNumber sink
-  Function(InputValueModel) get addSelectedNumber => _selectedNumber.sink.add;
+  Stream<Map<int, TileStateModel>> get tileListener =>
+      _tileListenerStream.stream;
 
   GameBoardBloc() {
-    _selectedNumber
-        .bufferCount(1)
-        .transform(_compareTransform(_selectedTile))
-        .pipe(_validAnswer);
+    gameBoards = null;
+    _loadGameBoardDataSet();
   }
 
+  // load game board dataset
+  Future<List> _loadGameBoardDataSet() async {
+    print("load called");
+    List<dynamic>? gbs = await _repo.getAllLocalGameBoards;
+    gameBoards = gbs;
+    return gbs;
+  }
+
+  // get a single game board by ID
+  Future<List<dynamic>> getGameBoardByID({required int id}) async {
+    var gb = gameBoards ?? await _loadGameBoardDataSet();
+    print(gb[0]["game_board"]);
+    return gb[0]["game_board"];
+  }
+
+  // get a single game board randomly
+  Future<List<dynamic>> getRandomGameBoard() async {
+    var gb = gameBoards ?? await _loadGameBoardDataSet();
+    int id = Random().nextInt(gb.length);
+    print("random int $id");
+    print(gb[id]["game_board"]);
+    return gb[id]["game_board"];
+  }
+
+  // select difficulty of game, called by UI element. Also, should be saved in the suer prefs
+  // retrieves the number of completed tiles needed per difficulty selected
+  void selectDifficulty(GameDifficulty difficulty) {
+    _gameDifficulty = difficulty;
+    _initCompletedTiles = getNumberOfCompletedTiles(difficulty);
+  }
+
+  //  TODO: (if blank) function to add a tile to _selectedTileValue -> updates TileState -> adds to stream
+  _handleBlankTileSubmitted(GameTileModel tileModel) {
+    _selectedTileValue = _selectedTileValue == null ? tileModel : null;
+  }
+
+  //  TODO: function called by user or game engine to generate a new game board and tile state
+
+  //  TODO: inside widgets ->  create a builder that returns a build gameBoard widget
+
+  //  TODO: below functions should be private, create a public method that handles the request from the tile
+
+  //  TODO: function that creates a new game board, if needed, Should be able to call getGameBoard
+
+  //  TODO: function to remove tile from _selectedTileValue -> updateStream ->
+  //  TODO: function that takes an int, if _selectedTileValue -> compares -> updates TileState -> adds to stream
+  //  TODO: function that generates gameBoardStates
+  //  TODO: getter that accesses gameBoardState map
+  //  TODO: (if complete) function that finds all tiles with same value, marks them as TileMode.highlighted
+  //  TODO: handle game settings (theme, etc.)
   dispose() {
-    _selectedTile.close();
-    _selectedNumber.close();
-    _validAnswer.close();
+    _tileListenerStream.close();
   }
 }
-
-// compare transformer, will compare the input stream and the tile value stream
-// and determine if the values match, then return a proper response on the
-// listening stream used by the individual tiles
-_compareTransform(Stream<GameTileModel> tile) {
-  return WithLatestFromStreamTransformer.with1(tile.bufferCount(1),
-      (List<InputValueModel> t, List<GameTileModel> s) {
-    return TileAnswerResponseModel(
-        tileId: s.single.id,
-        tileValue: s.single.tileValue,
-        correctResponse: t.single.value == s.single.tileValue);
-  });
-}
-
-//  TODO: remove test functions in game board
-//  TODO: create a stream that handles the generation of game boards
-//  TODO: revise models to handle tile states
-//  TODO: add functionality to select correct action
-//  TODO: may need to refactor stream transformer to accept "selection" -> bypass the number selection

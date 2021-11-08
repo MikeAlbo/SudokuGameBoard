@@ -11,36 +11,8 @@ class GameBoardScreen extends StatefulWidget {
 }
 
 class _GameBoardScreenState extends State<GameBoardScreen> {
-  // void _selectTile(GameBoardBloc gameBoardBloc) {
-  //   int number = Random().nextInt(2);
-  //   GameTileModel gameTileModel = GameTileModel(id: 1, tileValue: number);
-  //   gameBoardBloc.addSelectedTile(gameTileModel);
-  //   print("selectTile called: number => $number");
-  //   setState(() {});
-  // }
-  //
-  // void _selectNumber(GameBoardBloc gameBoardBloc) {
-  //   int number = Random().nextInt(2);
-  //   InputValueModel inputValueModel = InputValueModel(id: 1, value: number);
-  //   gameBoardBloc.addSelectedNumber(inputValueModel);
-  //   print("selectNumber called: number => $number");
-  //   setState(() {});
-  // }
-
   @override
   Widget build(BuildContext context) {
-    // GameBoardBloc _gameBoardBloc = GameBoardProvider.of(context);
-    // GameBloc gameBloc = GameProvider.of(context);
-    //
-    // void _getNewBoard() {
-    //   gameBloc.getRandomGameBoard();
-    //   setState(() {});
-    // }
-
-    // _gameBoardBloc.validAnswer.last((TileAnswerResponseModel event) {
-    //   print("valid Answer added to, event => ${event.correctResponse}");
-    // });
-
     Size screenSize = MediaQuery.of(context).size;
     double screenHeight = screenSize.height;
     double screenWidth = screenSize.width;
@@ -55,9 +27,16 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
     }
 
     return Scaffold(
+      // appBar: AppBar(
+      //   title: const Text(
+      //     "Sudoku",
+      //     style: TextStyle(fontSize: 30, color: Colors.blueGrey),
+      //   ),
+      //   backgroundColor: Colors.white,
+      // ),
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           // crossAxisAlignment:
           //     CrossAxisAlignment.stretch, //  TODO: use for full screen
           children: [

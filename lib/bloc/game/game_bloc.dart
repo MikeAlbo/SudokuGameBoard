@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:basic_game/api/repository.dart';
+import 'package:basic_game/helpers/enums.dart';
+import 'package:basic_game/helpers/game_state_builder.dart';
 
 /// Game Bloc
 ///
@@ -10,6 +12,8 @@ class GameBloc {
   final _repo = getRepository;
   bool gameBoardsLoaded = false;
   late List<dynamic>? gameBoards;
+  GameDifficulty _gameDifficulty = GameDifficulty.easy;
+  int _initCompletedTiles = 0;
 
   GameBloc() {
     gameBoards = null;
@@ -46,5 +50,15 @@ class GameBloc {
     return gb[id]["game_board"];
   }
   //  TODO: handle game settings (theme, etc.)
+
   //  TODO: handle game play settings (difficulty, etc.)
+  void selectDifficulty(GameDifficulty difficulty) {
+    _gameDifficulty = difficulty;
+    _initCompletedTiles = getNumberOfCompletedTiles(difficulty);
+  }
+
+  //  TODO: function that creates a new game board
+  //  TODO: function that generates gameBoardStates
+  //  TODO: getter that accesses gameBoardState map
+  //  TODO: inside widgets ->  create a builder that returns a build gameBoard widget
 }

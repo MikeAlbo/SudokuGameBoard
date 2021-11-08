@@ -1,7 +1,7 @@
 import 'package:basic_game/Themes/tile_decoration_themes.dart';
 import 'package:basic_game/bloc/gameBoard/game_board_provider.dart';
-import 'package:basic_game/models/game_tile_model.dart';
-import 'package:basic_game/models/tile_answer_response_model.dart';
+import 'package:basic_game/helpers/enums.dart';
+import 'package:basic_game/models/tile_state_model.dart';
 import 'package:flutter/material.dart';
 
 import 'tile_helper.dart';
@@ -41,12 +41,12 @@ class Tile extends StatefulWidget {
 class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
   Duration animationDuration =
       const Duration(milliseconds: 50); // duration of animation
+  String tileText = ""; // the text displayed inside the tile
   bool tileCompleted = false; // tile completed (is visible) var
   bool tileSelected = false; // tile is selected
   late Color tileColor; // tile color
   bool animationComplete = true; // tile animation bool
   TileMode tileMode = TileMode.blank; // current tile mode
-  late int valueDisplayed; // value displayed on tile when incorrect / selected
   void setTileToComplete() =>
       tileCompleted = true; // set child completed function
 
@@ -58,23 +58,19 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
         : widget.tileDecorationParams.blankInactive;
 
     tileCompleted = widget.initAsVisible;
+    //tileText = widget.initAsVisible ? widget.value.toString() : "";
 
-    tileMode = widget.initAsVisible ? TileMode.completed : TileMode.blank;
+    tileMode = widget.initAsVisible ? TileMode.complete : TileMode.blank;
   }
 
-  void handleInputFromStream(
-      {required TileAnswerResponseModel tileAnswerResponse}) {
-    if (tileAnswerResponse.tileId == widget.id) {
-      if (tileAnswerResponse.correctResponse) {
-        setTileToComplete();
-        tileColor = widget.tileDecorationParams.completed;
+  void handleInputFromStream({required Map<int, TileStateModel> response}) {
+    if (tileCompleted) {
+      if (response[1]?.value == widget.value) {
+        tileColor = widget.tileDecorationParams.highlighted;
+        print("widget value: ${widget.value}");
       } else {
-        tileColor = widget.tileDecorationParams.error;
+        tileColor = widget.tileDecorationParams.completed;
       }
-      //setState(() {});
-    } else if (tileAnswerResponse.tileValue == widget.value && tileCompleted) {
-      tileColor = widget.tileDecorationParams.highlighted;
-      //setState(() {});
     }
   }
 
@@ -92,22 +88,19 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
     setState(() {});
   }
 
-  void handleOnTap(GameBoardBloc bloc) {
-    if (!tileSelected && tileCompleted) {
-      tileColor = widget.tileDecorationParams.highlighted;
-    } else if (tileSelected && tileCompleted) {
-      tileColor = widget.tileDecorationParams.completed;
-    } else if (!tileSelected && !tileCompleted) {
-      tileColor = widget.tileDecorationParams.selected;
-      bloc.addSelectedTile(
-          GameTileModel(id: widget.id, tileValue: widget.value));
-    } else {
-      tileColor = widget.tileDecorationParams.blankInactive;
-    }
+  //  TODO: may need to refactor bloc.setSelectedState TBD
+  // void handleOnTap(GameBoardBloc bloc) {
+  //   if (tileCompleted) {
+  //     bloc.setSelectedTile(GameTileModel(
+  //         id: widget.id,
+  //         tileValue: widget.value,
+  //         tileMode: TileMode.complete));
+  //   } else {}
+  //   setState(() {});
+  // }
 
-    tileSelected = !tileSelected;
-
-    setState(() {});
+  void clearHighlights() {
+    tileColor = widget.tileDecorationParams.blankInactive;
   }
 
   @override
@@ -115,13 +108,14 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
     // access to gameBoard bloc
     GameBoardBloc gameBoardBloc = GameBoardProvider.of(context);
     return GestureDetector(
-      onTap: () => handleOnTap(gameBoardBloc),
+      onTap: () => {}, //handleOnTap(gameBoardBloc),
       child: StreamBuilder(
-        stream: gameBoardBloc.validAnswer,
+        stream: gameBoardBloc.tileListener,
         builder: (BuildContext context,
-            AsyncSnapshot<TileAnswerResponseModel> snapshot) {
+            AsyncSnapshot<Map<int, TileStateModel>> snapshot) {
           if (snapshot.hasData) {
-            handleInputFromStream(tileAnswerResponse: snapshot.requireData);
+            handleInputFromStream(response: snapshot.requireData);
+            //clearHighlights();
           }
           return AnimatedContainer(
             duration: animationDuration,
@@ -153,4 +147,10 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
       ),
     );
   }
+}
+
+void _handleOnTap(GameBoardBloc bloc) {
+  //  TODO: if tile blank, send message to highlight tile
+  //  TODO: if tile complete, send message to highlight all tiles with same number
+  //  TODO: if
 }
