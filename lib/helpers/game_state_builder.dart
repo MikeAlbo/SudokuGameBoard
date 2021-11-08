@@ -44,6 +44,7 @@ List<bool> generateRandomList(
 Map<int, TileStateModel> buildTileStateMap(
     {List<dynamic> gameBoard = mockGameBoardData,
     required int numberOfCompletedTiles}) {
+  print("building tile state map");
   // randomized t/f values t == complete, f == blank
   List<bool> randomizedTrue =
       generateRandomList(numberTrue: numberOfCompletedTiles, totalNeeded: 81);

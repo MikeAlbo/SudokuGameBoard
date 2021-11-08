@@ -32,10 +32,6 @@ List<TableRow> newGridBuilder(
     }
   });
   print("new grid complete");
-  gridOfRows.forEach((element) {
-    print(element);
-  });
-
   return gridOfRows;
 }
 

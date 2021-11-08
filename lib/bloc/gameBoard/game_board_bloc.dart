@@ -5,7 +5,6 @@ import 'package:basic_game/api/repository.dart';
 import 'package:basic_game/app/widgets/helpers/grid_builder.dart';
 import 'package:basic_game/helpers/enums.dart';
 import 'package:basic_game/helpers/game_state_builder.dart';
-import 'package:basic_game/models/game_tile_model.dart';
 import 'package:basic_game/models/tile_state_model.dart';
 import 'package:flutter/material.dart' show BuildContext, TableRow;
 import 'package:rxdart/rxdart.dart';
@@ -16,7 +15,7 @@ class GameBoardBloc {
   GameDifficulty _gameDifficulty = GameDifficulty.easy;
   int _initCompletedTiles = 0;
   final _tileListenerStream = BehaviorSubject<Map<int, TileStateModel>>();
-  GameTileModel? _selectedTileValue;
+  TileStateModel? _selectedTileValue;
   late Map<int, TileStateModel> mappedTilesForCurrentGame;
 
   // getter for listening for correct answer
@@ -40,7 +39,6 @@ class GameBoardBloc {
   // get a single game board by ID
   Future<List<dynamic>> _getGameBoardByID({required int id}) async {
     var gb = gameBoards ?? await _loadGameBoardDataSet();
-    print(gb[0]["game_board"]);
     return gb[0]["game_board"];
   }
 
@@ -59,11 +57,6 @@ class GameBoardBloc {
     _initCompletedTiles = getNumberOfCompletedTiles(difficulty);
   }
 
-  //  TODO: (if blank) function to add a tile to _selectedTileValue -> updates TileState -> adds to stream
-  _handleBlankTileSubmitted(GameTileModel tileModel) {
-    _selectedTileValue = _selectedTileValue == null ? tileModel : null;
-  }
-
   //  TODO: function called by user or game engine to generate a new game board and tile state
   Future<List<TableRow>> generateNewRandomGame(BuildContext context,
       {bool random = false, int id = 0}) async {
@@ -78,7 +71,57 @@ class GameBoardBloc {
     return finishedTableRows;
   }
 
-  //  TODO: function that creates a new game board, if needed, Should be able to call getGameBoard
+  // function called by tile, which will add it's TileStateModel  to _selectedTileState
+  // if _selectedTileState == addTile, _selectedTileState == null, mapped Tile States updated and added back to stream
+  void submitTileStateChange(TileStateModel tsm) {
+    print("called by ${tsm.id}");
+    TileStateModel newTsm;
+    if (tsm.id != _selectedTileValue?.id) {
+      _selectedTileValue = tsm;
+      switch (tsm.mode) {
+        case TileMode.blank:
+          newTsm = TileStateModel(
+              id: tsm.id, value: tsm.value, mode: TileMode.selected);
+          break;
+        // case TileMode.complete:
+        //   newTsm = TileStateModel(
+        //       id: tsm.id, value: tsm.value, mode: TileMode.highlighted);
+        //   break;
+        // case TileMode.error:
+        //   newTsm = TileStateModel(
+        //       id: tsm.id, value: tsm.value, mode: TileMode.blank);
+        //   break;
+        // case TileMode.highlighted:
+        //   newTsm = TileStateModel(
+        //       id: tsm.id, value: tsm.value, mode: TileMode.complete);
+        //   break;
+        case TileMode.selected:
+          newTsm = TileStateModel(
+              id: tsm.id, value: tsm.value, mode: TileMode.blank);
+          break;
+        default:
+          newTsm = TileStateModel(
+              id: tsm.id, value: tsm.value, mode: TileMode.error);
+      }
+    } else {
+      _selectedTileValue = null;
+      newTsm = newTsm =
+          TileStateModel(id: tsm.id, value: tsm.value, mode: TileMode.blank);
+    }
+    _updateMapAndAddToStream(newTsm);
+  }
+
+  void _updateMapAndAddToStream(TileStateModel updatedTsm) {
+    print(
+        "updatedTSM: id: ${updatedTsm.id}, value: ${updatedTsm.value}, mode: ${updatedTsm.mode}");
+    print("from map: ${mappedTilesForCurrentGame[updatedTsm.id]?.id}");
+    print(
+        "after update: id: ${mappedTilesForCurrentGame[updatedTsm.id]?.id}, mode: ${mappedTilesForCurrentGame[updatedTsm.id]?.mode}");
+    mappedTilesForCurrentGame.update(updatedTsm.id, (value) => updatedTsm);
+    print(
+        "after update: id: ${mappedTilesForCurrentGame[updatedTsm.id]?.id}, mode: ${mappedTilesForCurrentGame[updatedTsm.id]?.mode}");
+    _tileListenerStream.add(mappedTilesForCurrentGame);
+  }
 
   //  TODO: function to remove tile from _selectedTileValue -> updateStream ->
   //  TODO: function that takes an int, if _selectedTileValue -> compares -> updates TileState -> adds to stream

@@ -6,4 +6,5 @@ enum TileMode {
   complete, // a tile that is not selected but complete
   error, // a tile that has received an incorrect response--
   highlighted, // a tile that is complete, and tile number has been selected
+  selected, // when the tile is selected but is not complete
 }

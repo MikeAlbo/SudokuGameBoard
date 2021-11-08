@@ -40,7 +40,7 @@ class Tile extends StatefulWidget {
 
 class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
   Duration animationDuration =
-      const Duration(milliseconds: 50); // duration of animation
+      const Duration(milliseconds: 100); // duration of animation
   String tileText = ""; // the text displayed inside the tile
   bool tileCompleted = false; // tile completed (is visible) var
   bool tileSelected = false; // tile is selected
@@ -64,14 +64,11 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
   }
 
   void handleInputFromStream({required Map<int, TileStateModel> response}) {
-    if (tileCompleted) {
-      if (response[1]?.value == widget.value) {
-        tileColor = widget.tileDecorationParams.highlighted;
-        print("widget value: ${widget.value}");
-      } else {
-        tileColor = widget.tileDecorationParams.completed;
-      }
-    }
+    TileStateModel tileTsm = response[widget.id]!;
+    print(
+        "handle input --> ${tileTsm.id} --> ${tileTsm.mode} --> current mode: $tileMode");
+    tileMode = tileTsm.mode;
+    tileColor = tileMode == TileMode.selected ? Colors.yellow : Colors.white;
   }
 
   void updateState({required Color color, required bool setToComplete}) {
@@ -83,24 +80,10 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
     });
   }
 
-  void updateTileMode(
-      {required TileMode currentTileMode, required TileMode newTileMode}) {
-    setState(() {});
-  }
-
-  //  TODO: may need to refactor bloc.setSelectedState TBD
-  // void handleOnTap(GameBoardBloc bloc) {
-  //   if (tileCompleted) {
-  //     bloc.setSelectedTile(GameTileModel(
-  //         id: widget.id,
-  //         tileValue: widget.value,
-  //         tileMode: TileMode.complete));
-  //   } else {}
-  //   setState(() {});
-  // }
-
-  void clearHighlights() {
-    tileColor = widget.tileDecorationParams.blankInactive;
+  void onTileCLick(GameBoardBloc bloc) {
+    TileStateModel tsm =
+        TileStateModel(id: widget.id, value: widget.value, mode: tileMode);
+    bloc.submitTileStateChange(tsm);
   }
 
   @override
@@ -108,12 +91,13 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
     // access to gameBoard bloc
     GameBoardBloc gameBoardBloc = GameBoardProvider.of(context);
     return GestureDetector(
-      onTap: () => {}, //handleOnTap(gameBoardBloc),
+      onTap: () => onTileCLick(gameBoardBloc), //handleOnTap(gameBoardBloc),
       child: StreamBuilder(
         stream: gameBoardBloc.tileListener,
         builder: (BuildContext context,
             AsyncSnapshot<Map<int, TileStateModel>> snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData &&
+              snapshot.requireData[widget.id]?.mode != tileMode) {
             handleInputFromStream(response: snapshot.requireData);
             //clearHighlights();
           }
