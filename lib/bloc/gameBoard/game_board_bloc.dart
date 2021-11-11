@@ -61,6 +61,7 @@ class GameBoardBloc {
   Future<List<TableRow>> generateNewRandomGame(BuildContext context,
       {bool random = false, int id = 0}) async {
     print("get current game");
+    //mappedTilesForCurrentGame.clear();
     List<dynamic> gameBoard = await _getRandomGameBoard();
     Map<int, TileStateModel> mappedStates = buildTileStateMap(
         numberOfCompletedTiles: _initCompletedTiles, gameBoard: gameBoard);
@@ -74,7 +75,6 @@ class GameBoardBloc {
   // function called by tile, which will add it's TileStateModel  to _selectedTileState
   // if _selectedTileState == addTile, _selectedTileState == null, mapped Tile States updated and added back to stream
   void submitTileStateChange(TileStateModel tsm) {
-    print("called by ${tsm.id}");
     TileStateModel newTsm;
     if (tsm.id != _selectedTileValue?.id) {
       _selectedTileValue = tsm;
@@ -111,25 +111,18 @@ class GameBoardBloc {
     _updateMapAndAddToStream(newTsm);
   }
 
+  // if the tile selected is complete
+  // -- if the currentSelectedTile var is null
+  // -- -- add tile to currentSelectedTile
+  // -- --
+
   void _updateMapAndAddToStream(TileStateModel updatedTsm) {
-    print(
-        "updatedTSM: id: ${updatedTsm.id}, value: ${updatedTsm.value}, mode: ${updatedTsm.mode}");
-    print("from map: ${mappedTilesForCurrentGame[updatedTsm.id]?.id}");
-    print(
-        "after update: id: ${mappedTilesForCurrentGame[updatedTsm.id]?.id}, mode: ${mappedTilesForCurrentGame[updatedTsm.id]?.mode}");
     mappedTilesForCurrentGame.update(updatedTsm.id, (value) => updatedTsm);
-    print(
-        "after update: id: ${mappedTilesForCurrentGame[updatedTsm.id]?.id}, mode: ${mappedTilesForCurrentGame[updatedTsm.id]?.mode}");
     _tileListenerStream.add(mappedTilesForCurrentGame);
   }
 
-  //  TODO: function to remove tile from _selectedTileValue -> updateStream ->
-  //  TODO: function that takes an int, if _selectedTileValue -> compares -> updates TileState -> adds to stream
-  //  TODO: function that generates gameBoardStates
-  //  TODO: getter that accesses gameBoardState map
-  //  TODO: (if complete) function that finds all tiles with same value, marks them as TileMode.highlighted
-  //  TODO: handle game settings (theme, etc.)
   dispose() {
     _tileListenerStream.close();
+    mappedTilesForCurrentGame.clear();
   }
 }
