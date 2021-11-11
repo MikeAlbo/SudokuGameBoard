@@ -1,51 +1,65 @@
+import 'dart:async';
 import 'dart:core';
 import 'dart:math';
 
 import 'package:basic_game/api/repository.dart';
+import 'package:basic_game/app/game_engine.dart';
 import 'package:basic_game/app/widgets/helpers/grid_builder.dart';
 import 'package:basic_game/helpers/enums.dart';
-import 'package:basic_game/helpers/game_state_builder.dart';
 import 'package:basic_game/models/tile_state_model.dart';
 import 'package:flutter/material.dart' show BuildContext, TableRow;
 import 'package:rxdart/rxdart.dart';
 
+Completer _completer = Completer();
+Future get ready => _completer.future;
+
 class GameBoardBloc {
   final _repo = getRepository;
-  late List<dynamic>? gameBoards;
+  late GameEngine _gameEngine;
   GameDifficulty _gameDifficulty = GameDifficulty.easy;
-  int _initCompletedTiles = 0;
   final _tileListenerStream = BehaviorSubject<Map<int, TileStateModel>>();
-  TileStateModel? _selectedTileValue;
-  late Map<int, TileStateModel> mappedTilesForCurrentGame;
 
   // getter for listening for correct answer
   Stream<Map<int, TileStateModel>> get tileListener =>
       _tileListenerStream.stream;
 
   GameBoardBloc() {
-    gameBoards = null;
     print("game board created");
     // _loadGameBoardDataSet();
   }
 
-  // load game board dataset
-  Future<List> _loadGameBoardDataSet() async {
-    print("load called");
-    List<dynamic>? gbs = await _repo.getAllLocalGameBoards;
-    gameBoards = gbs;
-    return gbs;
+  void setupNewGame({required GameDifficulty difficulty}) async {
+    _gameEngine = GameEngine();
+    List<dynamic> gameBoard = await _getRandomGameBoard();
+    _gameDifficulty = difficulty;
+    _gameEngine.initializeGame(
+      gameBoardData: gameBoard,
+      difficulty: difficulty,
+    );
+    if (!_completer.isCompleted) {
+      _completer.complete();
+    }
+  }
+
+  void createNewGame() async {
+    _completer = Completer();
+    _gameEngine = GameEngine();
+    setupNewGame(difficulty: _gameDifficulty);
+    await ready;
+    _tileListenerStream.add(_gameEngine.getNewGameState);
   }
 
   // get a single game board by ID
-  Future<List<dynamic>> _getGameBoardByID({required int id}) async {
-    var gb = gameBoards ?? await _loadGameBoardDataSet();
-    return gb[0]["game_board"];
-  }
+  // Future<List<dynamic>> _getGameBoardByID({required int id}) async {
+  //   var gb = gameBoards ?? await _loadGameBoardDataSet();
+  //   return gb[0]["game_board"];
+  // }
 
   // get a single game board randomly
   Future<List<dynamic>> _getRandomGameBoard() async {
-    var gb = gameBoards ?? await _loadGameBoardDataSet();
+    var gb = await _repo.getAllLocalGameBoards;
     int id = Random().nextInt(gb.length);
+    print("gameboard id: $id");
     return gb[id]["game_board"];
   }
 
@@ -54,75 +68,21 @@ class GameBoardBloc {
   void selectDifficulty(GameDifficulty difficulty) {
     //  TODO: this function should call a repo function to update the user prefs
     _gameDifficulty = difficulty;
-    _initCompletedTiles = getNumberOfCompletedTiles(difficulty);
+    _gameEngine.setGameDifficulty = difficulty;
   }
 
   //  TODO: function called by user or game engine to generate a new game board and tile state
   Future<List<TableRow>> generateNewRandomGame(BuildContext context,
       {bool random = false, int id = 0}) async {
-    print("get current game");
-    //mappedTilesForCurrentGame.clear();
-    List<dynamic> gameBoard = await _getRandomGameBoard();
-    Map<int, TileStateModel> mappedStates = buildTileStateMap(
-        numberOfCompletedTiles: _initCompletedTiles, gameBoard: gameBoard);
-    mappedTilesForCurrentGame = mappedStates;
+    await ready;
+    Map<int, TileStateModel> mappedStates = _gameEngine.getNewGameState;
     List<TableRow> finishedTableRows =
         newGridBuilder(context: context, mappedStates: mappedStates);
 
     return finishedTableRows;
   }
 
-  // function called by tile, which will add it's TileStateModel  to _selectedTileState
-  // if _selectedTileState == addTile, _selectedTileState == null, mapped Tile States updated and added back to stream
-  void submitTileStateChange(TileStateModel tsm) {
-    TileStateModel newTsm;
-    if (tsm.id != _selectedTileValue?.id) {
-      _selectedTileValue = tsm;
-      switch (tsm.mode) {
-        case TileMode.blank:
-          newTsm = TileStateModel(
-              id: tsm.id, value: tsm.value, mode: TileMode.selected);
-          break;
-        // case TileMode.complete:
-        //   newTsm = TileStateModel(
-        //       id: tsm.id, value: tsm.value, mode: TileMode.highlighted);
-        //   break;
-        // case TileMode.error:
-        //   newTsm = TileStateModel(
-        //       id: tsm.id, value: tsm.value, mode: TileMode.blank);
-        //   break;
-        // case TileMode.highlighted:
-        //   newTsm = TileStateModel(
-        //       id: tsm.id, value: tsm.value, mode: TileMode.complete);
-        //   break;
-        case TileMode.selected:
-          newTsm = TileStateModel(
-              id: tsm.id, value: tsm.value, mode: TileMode.blank);
-          break;
-        default:
-          newTsm = TileStateModel(
-              id: tsm.id, value: tsm.value, mode: TileMode.error);
-      }
-    } else {
-      _selectedTileValue = null;
-      newTsm = newTsm =
-          TileStateModel(id: tsm.id, value: tsm.value, mode: TileMode.blank);
-    }
-    _updateMapAndAddToStream(newTsm);
-  }
-
-  // if the tile selected is complete
-  // -- if the currentSelectedTile var is null
-  // -- -- add tile to currentSelectedTile
-  // -- --
-
-  void _updateMapAndAddToStream(TileStateModel updatedTsm) {
-    mappedTilesForCurrentGame.update(updatedTsm.id, (value) => updatedTsm);
-    _tileListenerStream.add(mappedTilesForCurrentGame);
-  }
-
   dispose() {
     _tileListenerStream.close();
-    mappedTilesForCurrentGame.clear();
   }
 }

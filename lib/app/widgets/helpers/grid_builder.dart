@@ -11,6 +11,7 @@ Random random = Random();
 List<TableRow> newGridBuilder(
     {required BuildContext context,
     required Map<int, TileStateModel> mappedStates}) {
+  print("new grid");
   TileDecorationParams tileDecorationParams = TileDecorationParams();
   Size ctxSize = MediaQuery.of(context).size;
   double tileWidth = ctxSize.width / 15;

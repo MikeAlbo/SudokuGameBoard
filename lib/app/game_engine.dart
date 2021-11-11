@@ -11,6 +11,10 @@ class GameEngine {
   int _completedTiles = 0;
   late GameDifficulty _gameDifficulty;
 
+  GameEngine() {
+    print("game engine init!!! ----------");
+  }
+
   // set the difficulty of the current game
   set setGameDifficulty(GameDifficulty difficulty) =>
       _gameDifficulty = difficulty;

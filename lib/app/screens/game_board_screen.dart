@@ -1,7 +1,6 @@
 import 'package:basic_game/app/widgets/game_board.dart';
 import 'package:basic_game/app/widgets/number_row_selector.dart';
 import 'package:basic_game/bloc/gameBoard/game_board_provider.dart';
-import 'package:basic_game/helpers/enums.dart';
 import 'package:flutter/material.dart';
 
 class GameBoardScreen extends StatefulWidget {
@@ -16,7 +15,8 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
   Widget build(BuildContext context) {
     print("screen built");
     GameBoardBloc _gameBoardBloc = GameBoardProvider.of(context);
-    _gameBoardBloc.selectDifficulty(GameDifficulty.medium);
+    //_gameBoardBloc.selectDifficulty(GameDifficulty.medium);
+    // _gameBoardBloc.setupNewGame(difficulty: GameDifficulty.easy);
     Size screenSize = MediaQuery.of(context).size;
     double screenHeight = screenSize.height;
     double screenWidth = screenSize.width;
@@ -59,6 +59,13 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
                           child: Text("loading"),
                         ),
             ),
+            OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    _gameBoardBloc.createNewGame();
+                  });
+                },
+                child: const Text("create new game")),
             const NumberRowSelector(),
           ],
         ),

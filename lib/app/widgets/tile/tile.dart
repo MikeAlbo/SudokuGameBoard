@@ -40,7 +40,7 @@ class Tile extends StatefulWidget {
 
 class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
   Duration animationDuration =
-      const Duration(milliseconds: 100); // duration of animation
+      const Duration(milliseconds: 500); // duration of animation
   String tileText = ""; // the text displayed inside the tile
   bool tileCompleted = false; // tile completed (is visible) var
   bool tileSelected = false; // tile is selected
@@ -83,11 +83,13 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
   void onTileCLick(GameBoardBloc bloc) {
     TileStateModel tsm =
         TileStateModel(id: widget.id, value: widget.value, mode: tileMode);
-    bloc.submitTileStateChange(tsm);
+    // bloc.submitTileStateChange(tsm);
   }
 
   @override
   Widget build(BuildContext context) {
+    print(
+        "tile ${widget.id} has been built --> complete? ${widget.initAsVisible}");
     // access to gameBoard bloc
     GameBoardBloc gameBoardBloc = GameBoardProvider.of(context);
     return GestureDetector(
@@ -96,14 +98,21 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
         stream: gameBoardBloc.tileListener,
         builder: (BuildContext context,
             AsyncSnapshot<Map<int, TileStateModel>> snapshot) {
-          if (snapshot.hasData &&
-              snapshot.requireData[widget.id]?.mode != tileMode) {
-            handleInputFromStream(response: snapshot.requireData);
+          // print("tile: ${widget.id} stream builder <---!!");
+          if (snapshot.hasData) {
+            if (snapshot.requireData[widget.id]?.mode == TileMode.complete) {
+              tileMode = TileMode.complete;
+              tileCompleted = true;
+            } else {
+              tileMode = TileMode.blank;
+              tileCompleted = false;
+            }
+            //setState(() {});
             //clearHighlights();
           }
           return AnimatedContainer(
             duration: animationDuration,
-            color: tileColor,
+            color: colorSelector(tileMode, widget.tileDecorationParams),
             child: Container(
               //  TODO: on end animation, check to see if it needs to replay
               decoration: BoxDecoration(
@@ -137,4 +146,19 @@ void _handleOnTap(GameBoardBloc bloc) {
   //  TODO: if tile blank, send message to highlight tile
   //  TODO: if tile complete, send message to highlight all tiles with same number
   //  TODO: if
+}
+
+Color colorSelector(TileMode mode, TileDecorationParams tileDecorationParams) {
+  switch (mode) {
+    case TileMode.blank:
+      return tileDecorationParams.blankInactive;
+    case TileMode.complete:
+      return tileDecorationParams.completed;
+    case TileMode.error:
+      return tileDecorationParams.error;
+    case TileMode.highlighted:
+      return tileDecorationParams.highlighted;
+    case TileMode.selected:
+      return tileDecorationParams.selected;
+  }
 }

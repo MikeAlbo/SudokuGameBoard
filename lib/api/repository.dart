@@ -7,7 +7,7 @@ import 'package:basic_game/api/boardData/board_data_api.dart';
 ///
 
 // initialize  API instances
-final _boardDataApi = BoardDataApi(dataSetName: "twoTest.json");
+final _boardDataApi = BoardDataApi(dataSetName: "test50.json");
 
 // main class definition
 class _Repository {
