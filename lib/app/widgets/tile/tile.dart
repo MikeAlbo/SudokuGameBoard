@@ -65,10 +65,28 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
 
   void handleInputFromStream({required Map<int, TileStateModel> response}) {
     TileStateModel tileTsm = response[widget.id]!;
-    print(
-        "handle input --> ${tileTsm.id} --> ${tileTsm.mode} --> current mode: $tileMode");
-    tileMode = tileTsm.mode;
-    tileColor = tileMode == TileMode.selected ? Colors.yellow : Colors.white;
+    switch (tileTsm.mode) {
+      case TileMode.blank:
+        tileMode = TileMode.blank;
+        tileCompleted = false;
+        break;
+      case TileMode.complete:
+        tileMode = TileMode.complete;
+        tileCompleted = true;
+        break;
+      case TileMode.error:
+        tileMode = TileMode.error;
+        tileCompleted = false;
+        break;
+      case TileMode.highlighted:
+        tileMode = TileMode.highlighted;
+        tileCompleted = true;
+        break;
+      case TileMode.selected:
+        tileMode = TileMode.selected;
+        tileCompleted = false;
+        break;
+    }
   }
 
   void updateState({required Color color, required bool setToComplete}) {
@@ -88,8 +106,6 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        "tile ${widget.id} has been built --> complete? ${widget.initAsVisible}");
     // access to gameBoard bloc
     GameBoardBloc gameBoardBloc = GameBoardProvider.of(context);
     return GestureDetector(
@@ -100,15 +116,14 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
             AsyncSnapshot<Map<int, TileStateModel>> snapshot) {
           // print("tile: ${widget.id} stream builder <---!!");
           if (snapshot.hasData) {
-            if (snapshot.requireData[widget.id]?.mode == TileMode.complete) {
-              tileMode = TileMode.complete;
-              tileCompleted = true;
-            } else {
-              tileMode = TileMode.blank;
-              tileCompleted = false;
-            }
-            //setState(() {});
-            //clearHighlights();
+            // if (snapshot.requireData[widget.id]?.mode == TileMode.complete) {
+            //   tileMode = TileMode.complete;
+            //   tileCompleted = true;
+            // } else {
+            //   tileMode = TileMode.blank;
+            //   tileCompleted = false;
+            // }
+            handleInputFromStream(response: snapshot.requireData);
           }
           return AnimatedContainer(
             duration: animationDuration,
