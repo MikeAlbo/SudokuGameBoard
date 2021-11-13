@@ -82,6 +82,19 @@ class GameBoardBloc {
     return finishedTableRows;
   }
 
+  void updateSelectedTile(TileStateModel tileStateModel) async {
+    await ready;
+    Map<int, TileStateModel> updatedMappedTileStateModes;
+    if (tileStateModel.mode == TileMode.complete) {
+      updatedMappedTileStateModes =
+          _gameEngine.updateCompletedTiles(tileStateModel);
+    } else {
+      updatedMappedTileStateModes =
+          _gameEngine.updateCompletedTiles(tileStateModel);
+    }
+    _tileListenerStream.add(updatedMappedTileStateModes);
+  }
+
   dispose() {
     _tileListenerStream.close();
   }

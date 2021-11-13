@@ -101,7 +101,7 @@ class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
   void onTileCLick(GameBoardBloc bloc) {
     TileStateModel tsm =
         TileStateModel(id: widget.id, value: widget.value, mode: tileMode);
-    // bloc.submitTileStateChange(tsm);
+    bloc.updateSelectedTile(tsm);
   }
 
   @override

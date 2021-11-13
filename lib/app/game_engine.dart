@@ -44,6 +44,7 @@ class GameEngine {
       gameBoard: _gameBoard,
       numberOfCompletedTiles: _completedTiles,
     );
+    _currentSelectedTile = null;
   }
 
   // Map<int, TileStateModel> updateTileStates(TileStateModel updatedTileState) {
@@ -57,20 +58,66 @@ class GameEngine {
   // }
 
   Map<int, TileStateModel> updateCompletedTiles(TileStateModel updatedTile) {
-    if (_currentSelectedTile?.id == updatedTile.id) {
-      _newGameState = _currentGameState;
+    //TileMode currentMode;
+    int currentValue = updatedTile.value;
+
+    if (_currentSelectedTile == null) {
+      // set the current state, highlight all the tiles with the same value
+      _currentSelectedTile = updatedTile;
+      _newGameState = _updateTileState(
+          currentMappedState: _newGameState,
+          newMode: TileMode.highlighted,
+          currentMode: TileMode.complete,
+          tileValue: currentValue);
+    } else if (_currentSelectedTile?.id == updatedTile.id) {
+      // set the currentSelected to null, change highlighted to complete
+      currentValue = _currentSelectedTile!.value;
+      _newGameState = _updateTileState(
+          currentMappedState: _newGameState,
+          newMode: TileMode.complete,
+          currentMode: TileMode.highlighted,
+          tileValue: currentValue);
+      _currentSelectedTile = null;
+    } else {
+      // change all of the current highlighted to complete
+      currentValue = _currentSelectedTile!.value;
+      _newGameState = _updateTileState(
+          currentMappedState: _newGameState,
+          newMode: TileMode.complete,
+          currentMode: TileMode.highlighted,
+          tileValue: currentValue);
+      print("current value : $currentValue");
+      // set the currentSelected to the new update
+      _currentSelectedTile = updatedTile;
+      // change the current complete w matching value to highlighted
+      currentValue = updatedTile.value;
+      _newGameState = _updateTileState(
+          currentMappedState: _newGameState,
+          newMode: TileMode.highlighted,
+          currentMode: TileMode.complete,
+          tileValue: currentValue);
+      print("new value : $currentValue");
     }
-    _newGameState.forEach((key, value) {
-      if (value.value == updatedTile.value && value.mode == TileMode.complete) {
-        _newGameState.update(
-            key,
-            (value) => TileStateModel(
-                id: value.id, value: value.value, mode: TileMode.highlighted));
-      }
-    });
 
-    _currentGameState = _newGameState;
-
+    // switch (updatedTile){
+    //   case
+    // }
     return _newGameState;
   }
+}
+
+Map<int, TileStateModel> _updateTileState(
+    {required Map<int, TileStateModel> currentMappedState,
+    required TileMode newMode,
+    required TileMode currentMode,
+    required int tileValue}) {
+  currentMappedState.forEach((key, value) {
+    if (value.mode == currentMode && value.value == tileValue) {
+      currentMappedState.update(
+          key,
+          (value) =>
+              TileStateModel(id: value.id, value: value.value, mode: newMode));
+    }
+  });
+  return currentMappedState;
 }
