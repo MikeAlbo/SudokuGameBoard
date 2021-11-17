@@ -22,6 +22,17 @@ class GameEngine {
   // get the difficulty of the current game
   GameDifficulty get getGameDifficulty => _gameDifficulty;
 
+  //TileStateModel? get isTileSelected => _currentSelectedTile;
+
+  bool readyForNumberCompare() {
+    if (_currentSelectedTile == null ||
+        _currentSelectedTile!.mode != TileMode.blank) {
+      print("false! ${_currentSelectedTile!.mode}");
+      return false;
+    }
+    return true;
+  }
+
   // update a tile in the current game state and set it as the new state
   //  TODO: refactor to handle mode changes
   set updateTileInGameState(TileStateModel updatedTile) {
@@ -46,16 +57,6 @@ class GameEngine {
     );
     _currentSelectedTile = null;
   }
-
-  // Map<int, TileStateModel> updateTileStates(TileStateModel updatedTileState) {
-  //   if (_currentSelectedTile == null) {
-  //     _currentSelectedTile = updatedTileState;
-  //     _currentGameState = _newGameState;
-  //   } else if (_currentSelectedTile?.id == updatedTileState.id) {
-  //     _currentSelectedTile = null;
-  //     // handle tiles have same id
-  //   } else {}
-  // }
 
   Map<int, TileStateModel> updateCompletedTiles(TileStateModel updatedTile) {
     //TileMode currentMode;
@@ -99,9 +100,6 @@ class GameEngine {
           tileValue: currentValue);
     }
 
-    // switch (updatedTile){
-    //   case
-    // }
     return _newGameState;
   }
 
@@ -116,13 +114,16 @@ class GameEngine {
               value: updatedTile.value,
               mode: TileMode.selected));
     } else if (_currentSelectedTile!.id != updatedTile.id) {
-      removeHighlights(_newGameState, false);
+      _newGameState = removeHighlights(_newGameState, false);
       _newGameState.update(
           _currentSelectedTile!.id,
           (value) => TileStateModel(
               id: _currentSelectedTile!.id,
               value: _currentSelectedTile!.value,
-              mode: TileMode.blank));
+              mode: _currentSelectedTile!.mode == TileMode.complete
+                  ? TileMode.complete
+                  : TileMode.blank));
+      print("tile 1 first update: ${_newGameState[1]!.mode}");
       _newGameState.update(
           updatedTile.id,
           (value) => TileStateModel(
@@ -130,8 +131,9 @@ class GameEngine {
               value: updatedTile.value,
               mode: TileMode.selected));
       _currentSelectedTile = updatedTile;
+      print("tile 1 last update: ${_newGameState[1]!.mode}");
     } else {
-      removeHighlights(_newGameState, false);
+      _newGameState = removeHighlights(_newGameState, false);
       _newGameState.update(
           _currentSelectedTile!.id,
           (value) => TileStateModel(
@@ -143,7 +145,31 @@ class GameEngine {
 
     return _newGameState;
   }
-}
+
+  // handle comparison of tile and inout number
+  Map<int, TileStateModel> testNumberAgainstTile({required int number}) {
+    if (_currentSelectedTile != null) {
+      if (_currentSelectedTile!.value == number) {
+        _newGameState.update(
+            _currentSelectedTile!.id,
+            (value) => TileStateModel(
+                id: _currentSelectedTile!.id,
+                value: _currentSelectedTile!.value,
+                mode: TileMode.complete));
+        _currentSelectedTile = null;
+      } else {
+        _newGameState.update(
+            _currentSelectedTile!.id,
+            (value) => TileStateModel(
+                id: _currentSelectedTile!.id,
+                value: _currentSelectedTile!.value,
+                mode: TileMode.error));
+      }
+    }
+
+    return _newGameState;
+  }
+} // game engine
 
 Map<int, TileStateModel> _updateTileState(
     {required Map<int, TileStateModel> currentMappedState,

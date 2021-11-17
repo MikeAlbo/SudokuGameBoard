@@ -101,6 +101,12 @@ class GameBoardBloc {
   }
 
   //  TODO: function to compare tile value and number, return complete/error
+  void testSelectedNumberAgainstTile({required int selectedNumber}) {
+    if (_gameEngine.readyForNumberCompare()) {
+      _tileListenerStream
+          .add(_gameEngine.testNumberAgainstTile(number: selectedNumber));
+    }
+  }
 
   dispose() {
     _tileListenerStream.close();

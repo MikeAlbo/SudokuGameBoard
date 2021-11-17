@@ -29,7 +29,7 @@ GestureDetector numberBuilder(
     {required GameBoardBloc gameBoardBloc, required int number}) {
   return GestureDetector(
     onTap: () {
-      // gameBoardBloc.compareNumberToTileValue(number);
+      gameBoardBloc.testSelectedNumberAgainstTile(selectedNumber: number);
     },
     child: Container(
       height: 100,
