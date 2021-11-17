@@ -71,6 +71,7 @@ class GameEngine {
           tileValue: currentValue);
     } else if (_currentSelectedTile?.id == updatedTile.id) {
       // set the currentSelected to null, change highlighted to complete
+      removeHighlights(_newGameState, false);
       currentValue = _currentSelectedTile!.value;
       _newGameState = _updateTileState(
           currentMappedState: _newGameState,
@@ -81,12 +82,12 @@ class GameEngine {
     } else {
       // change all of the current highlighted to complete
       currentValue = _currentSelectedTile!.value;
+      removeHighlights(_newGameState, false);
       _newGameState = _updateTileState(
           currentMappedState: _newGameState,
           newMode: TileMode.complete,
           currentMode: TileMode.highlighted,
           tileValue: currentValue);
-      print("current value : $currentValue");
       // set the currentSelected to the new update
       _currentSelectedTile = updatedTile;
       // change the current complete w matching value to highlighted
@@ -96,12 +97,50 @@ class GameEngine {
           newMode: TileMode.highlighted,
           currentMode: TileMode.complete,
           tileValue: currentValue);
-      print("new value : $currentValue");
     }
 
     // switch (updatedTile){
     //   case
     // }
+    return _newGameState;
+  }
+
+  Map<int, TileStateModel> updateNonCompletedTile(
+      {required TileStateModel updatedTile}) {
+    if (_currentSelectedTile == null) {
+      _currentSelectedTile = updatedTile;
+      _newGameState.update(
+          updatedTile.id,
+          (value) => TileStateModel(
+              id: updatedTile.id,
+              value: updatedTile.value,
+              mode: TileMode.selected));
+    } else if (_currentSelectedTile!.id != updatedTile.id) {
+      removeHighlights(_newGameState, true);
+      _newGameState.update(
+          _currentSelectedTile!.id,
+          (value) => TileStateModel(
+              id: _currentSelectedTile!.id,
+              value: _currentSelectedTile!.value,
+              mode: TileMode.blank));
+      _newGameState.update(
+          updatedTile.id,
+          (value) => TileStateModel(
+              id: updatedTile.id,
+              value: updatedTile.value,
+              mode: TileMode.selected));
+      _currentSelectedTile = updatedTile;
+    } else {
+      removeHighlights(_newGameState, true);
+      _newGameState.update(
+          _currentSelectedTile!.id,
+          (value) => TileStateModel(
+              id: updatedTile.id,
+              value: updatedTile.value,
+              mode: TileMode.blank));
+      _currentSelectedTile = null;
+    }
+
     return _newGameState;
   }
 }
@@ -120,4 +159,29 @@ Map<int, TileStateModel> _updateTileState(
     }
   });
   return currentMappedState;
+}
+
+Map<int, TileStateModel> removeHighlights(
+    Map<int, TileStateModel> gameState, bool complete) {
+  Map<int, TileStateModel> tempMap = gameState;
+  if (complete) {
+    tempMap.forEach((key, value) {
+      if (value.mode == TileMode.highlighted) {
+        tempMap.update(
+            key,
+            (value) => TileStateModel(
+                id: value.id, value: value.value, mode: TileMode.complete));
+      }
+    });
+  } else {
+    tempMap.forEach((key, value) {
+      if (value.mode == TileMode.selected) {
+        tempMap.update(
+            key,
+            (value) => TileStateModel(
+                id: value.id, value: value.value, mode: TileMode.blank));
+      }
+    });
+  }
+  return tempMap;
 }
