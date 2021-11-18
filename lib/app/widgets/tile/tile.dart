@@ -40,7 +40,7 @@ class Tile extends StatefulWidget {
 
 class _TileState extends State<Tile> with SingleTickerProviderStateMixin {
   Duration animationDuration =
-      const Duration(milliseconds: 500); // duration of animation
+      const Duration(milliseconds: 50); // duration of animation
   String tileText = ""; // the text displayed inside the tile
   bool tileCompleted = false; // tile completed (is visible) var
   bool tileSelected = false; // tile is selected

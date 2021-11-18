@@ -71,6 +71,9 @@ class GameBoardBloc {
     _gameEngine.setGameDifficulty = difficulty;
   }
 
+  // get the game difficulty
+  GameDifficulty get getCurrentGameDifficulty => _gameDifficulty;
+
   //  TODO: function called by user or game engine to generate a new game board and tile state
   Future<List<TableRow>> generateNewRandomGame(BuildContext context,
       {bool random = false, int id = 0}) async {

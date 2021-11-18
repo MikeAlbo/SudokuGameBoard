@@ -11,8 +11,9 @@ Container buildGameBoard({
   required List<TableRow> child,
 }) {
   return Container(
-      width: tableWidth,
-      height: tableHeight,
+      color: Colors.green,
+      // width: tableWidth,
+      // height: tableHeight,
       margin: const EdgeInsets.all(
           10), //  TODO:maybe need to convert to dynamic value
       child: FittedBox(

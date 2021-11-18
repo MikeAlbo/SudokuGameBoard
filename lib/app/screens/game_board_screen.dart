@@ -1,5 +1,8 @@
+import 'package:basic_game/app/widgets/gameBoardScreen/GameControlBar/game_control_bar.dart';
+import 'package:basic_game/app/widgets/gameBoardScreen/appBar/app_bar.dart';
+import 'package:basic_game/app/widgets/gameBoardScreen/gameStateDisplay/game_state_display.dart';
+import 'package:basic_game/app/widgets/gameBoardScreen/number_row_selector.dart';
 import 'package:basic_game/app/widgets/game_board.dart';
-import 'package:basic_game/app/widgets/number_row_selector.dart';
 import 'package:basic_game/bloc/gameBoard/game_board_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +26,7 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
     bool isFullScreen = false; // todo: should be set by gameBloc
     double standardSizeAdjustment = 0.90;
     double fullScreenSizeSizeAdjustment = 0.95;
+    _gameBoardBloc.createNewGame(); //  TODO: should be called on route change
 
     double _getAspectSize(double size, bool isFullScreen) {
       double adjustmentValue =
@@ -31,19 +35,17 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
     }
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text(
-      //     "Sudoku",
-      //     style: TextStyle(fontSize: 30, color: Colors.blueGrey),
-      //   ),
-      //   backgroundColor: Colors.white,
-      // ),
+      appBar: buildGameBoardScreenAppBar(bloc: _gameBoardBloc, title: "Sudoku"),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           // crossAxisAlignment:
           //     CrossAxisAlignment.stretch, //  TODO: use for full screen
           children: [
+            GameStateDisplay(
+              gameDifficulty: _gameBoardBloc.getCurrentGameDifficulty,
+              createNewGame: _gameBoardBloc.createNewGame,
+            ),
             FutureBuilder(
               future: _gameBoardBloc.generateNewRandomGame(context),
               builder: (BuildContext context,
@@ -56,16 +58,10 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
                           isFullScreen: isFullScreen,
                           child: snapshot.data!)
                       : const Center(
-                          child: Text("loading"),
+                          child: Text("yeah"),
                         ),
             ),
-            OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    _gameBoardBloc.createNewGame();
-                  });
-                },
-                child: const Text("create new game")),
+            GameControlBar(),
             const NumberRowSelector(),
           ],
         ),
